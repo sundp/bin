@@ -3,7 +3,7 @@ set -eu
 
 VERSION="0.1"
 
-. "$(dirname "$0")/bash-backtrace.sh"
+#. "$(dirname "$0")/bash-backtrace.sh"
 
 usage() {
     basename="$(basename "$0")"
@@ -77,7 +77,8 @@ encrypt_bundle() {
     rm -fv "${GCB_FILE}.gpg"
     run gpg -c --batch --passphrase-fd 0 "$GCB_FILE" < "$GCB_PASS_FILE"
     rm -fv "${GCB_FILE}.gpg.gpg"
-    run gpg -e -r "$GPG_RECIPIENT" --batch "${GCB_FILE}.gpg"
+    local recipient_args="$(echo $GPG_RECIPIENT| awk -F, '{for (i=1;i<=NF;i++)printf "-r %s ",$i}')"
+    run gpg -e $recipient_args --batch "${GCB_FILE}.gpg"
 
     popd
 }
